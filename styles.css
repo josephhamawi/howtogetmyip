@@ -232,6 +232,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
 .ad-banner p {
@@ -242,14 +243,27 @@ body {
 
 .ad-top,
 .ad-bottom {
-    height: 90px;
+    min-height: 90px;
+    height: auto;
     margin-bottom: 20px;
+    padding: 0;
 }
 
 .ad-side {
     width: 160px;
-    height: 600px;
-    writing-mode: vertical-rl;
+    min-height: 600px;
+    height: auto;
+}
+
+/* AdSense styling */
+.adsbygoogle {
+    display: block;
+    text-align: center;
+}
+
+.ad-banner ins {
+    margin: 0;
+    padding: 0;
 }
 
 /* Messages */

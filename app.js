@@ -220,7 +220,7 @@
   }
 
   // Populate user info in the UI
-  function populateUserInfo(data) {
+  function populateUserInfo(data, ipv6Data = null) {
       // Update UI with user's IP info
       const ipElement = document.getElementById('userIp');
       ipElement.textContent = data.ip;
@@ -232,6 +232,30 @@
       const ipVersion = getIPVersion(data.ip);
       const privateRange = isPrivateIP(data.ip);
       const isDatacenter = data.asn ? isDatacenterIP(data.asn) : false;
+
+      // Display IPv4 and IPv6 separately
+      const ipv4Element = document.getElementById('userIPv4');
+      const ipv6Element = document.getElementById('userIPv6');
+
+      if (ipVersion === 'IPv4') {
+          ipv4Element.textContent = data.ip;
+          ipv4Element.style.cursor = 'pointer';
+          ipv4Element.onclick = () => copyToClipboard(data.ip, 'userIPv4');
+      } else {
+          ipv4Element.textContent = 'N/A';
+      }
+
+      if (ipv6Data && ipv6Data.ip) {
+          ipv6Element.textContent = ipv6Data.ip;
+          ipv6Element.style.cursor = 'pointer';
+          ipv6Element.onclick = () => copyToClipboard(ipv6Data.ip, 'userIPv6');
+      } else if (ipVersion === 'IPv6') {
+          ipv6Element.textContent = data.ip;
+          ipv6Element.style.cursor = 'pointer';
+          ipv6Element.onclick = () => copyToClipboard(data.ip, 'userIPv6');
+      } else {
+          ipv6Element.textContent = 'Not Available';
+      }
 
       // Network Information with enhanced classification
       let ipTypeText = ipVersion;
@@ -332,13 +356,31 @@
       }
   }
 
+  // Fetch IPv6 address
+  async function getIPv6() {
+      try {
+          const response = await fetch('https://api64.ipify.org?format=json', {
+              signal: AbortSignal.timeout(5000)
+          });
+          const data = await response.json();
+          if (data.ip && getIPVersion(data.ip) === 'IPv6') {
+              return { ip: data.ip };
+          }
+      } catch (error) {
+          console.log('IPv6 not available or detection failed:', error);
+      }
+      return null;
+  }
+
   // Fetch user's IP information on load
   async function getUserIP() {
       try {
           // Check cache first
           const cached = getCachedData('userIP');
           if (cached) {
-              populateUserInfo(cached);
+              // Try to fetch IPv6 in parallel
+              const ipv6Data = await getIPv6();
+              populateUserInfo(cached, ipv6Data);
               return;
           }
 
@@ -372,7 +414,10 @@
 
                   // Success - cache and populate
                   setCacheData('userIP', data);
-                  populateUserInfo(data);
+
+                  // Try to fetch IPv6 in parallel
+                  const ipv6Data = await getIPv6();
+                  populateUserInfo(data, ipv6Data);
                   return;
               } catch (err) {
                   attempts++;
