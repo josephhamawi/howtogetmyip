@@ -2,6 +2,29 @@
   let map;
   let marker;
 
+  // Cache for API responses to prevent rate limiting
+  const apiCache = new Map();
+  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+  // IP Classification constants
+  const PRIVATE_IP_RANGES = [
+      { range: '10.0.0.0/8', name: 'Private Network (Class A)' },
+      { range: '172.16.0.0/12', name: 'Private Network (Class B)' },
+      { range: '192.168.0.0/16', name: 'Private Network (Class C)' },
+      { range: '127.0.0.0/8', name: 'Loopback' },
+      { range: '169.254.0.0/16', name: 'Link-Local' },
+      { range: '224.0.0.0/4', name: 'Multicast' },
+      { range: '240.0.0.0/4', name: 'Reserved' }
+  ];
+
+  // Known datacenter/hosting ASNs (partial list)
+  const DATACENTER_ASNS = [
+      'AS15169', 'AS16509', 'AS14618', // Google, Amazon, AWS
+      'AS8075', 'AS12876', // Microsoft, Online SAS
+      'AS20473', 'AS63949', // Choopa (Vultr), Linode
+      'AS24940', 'AS16276' // Hetzner, OVH
+  ];
+
   // Initialize the map
   function initMap(lat = 0, lon = 0, zoom = 2) {
       if (map) {
@@ -19,6 +42,83 @@
       if (lat !== 0 || lon !== 0) {
           addMarker(lat, lon);
       }
+  }
+
+  // IPv4 validation
+  function isValidIPv4(ip) {
+      const ipv4Pattern = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+      return ipv4Pattern.test(ip);
+  }
+
+  // IPv6 validation
+  function isValidIPv6(ip) {
+      const ipv6Pattern = /^(([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
+      return ipv6Pattern.test(ip);
+  }
+
+  // Check if IP is private/reserved
+  function isPrivateIP(ip) {
+      if (!isValidIPv4(ip)) return null;
+
+      const octets = ip.split('.').map(Number);
+
+      // Check each private range
+      if (octets[0] === 10) return PRIVATE_IP_RANGES[0];
+      if (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31) return PRIVATE_IP_RANGES[1];
+      if (octets[0] === 192 && octets[1] === 168) return PRIVATE_IP_RANGES[2];
+      if (octets[0] === 127) return PRIVATE_IP_RANGES[3];
+      if (octets[0] === 169 && octets[1] === 254) return PRIVATE_IP_RANGES[4];
+      if (octets[0] >= 224 && octets[0] <= 239) return PRIVATE_IP_RANGES[5];
+      if (octets[0] >= 240) return PRIVATE_IP_RANGES[6];
+
+      return null;
+  }
+
+  // Detect if IP is from datacenter/hosting
+  function isDatacenterIP(asn) {
+      return DATACENTER_ASNS.includes(asn);
+  }
+
+  // Get IP version
+  function getIPVersion(ip) {
+      if (isValidIPv4(ip)) return 'IPv4';
+      if (isValidIPv6(ip)) return 'IPv6';
+      return 'Unknown';
+  }
+
+  // Copy to clipboard function
+  function copyToClipboard(text, elementId) {
+      navigator.clipboard.writeText(text).then(() => {
+          const element = document.getElementById(elementId);
+          const originalText = element.textContent;
+          element.textContent = 'Copied!';
+          element.style.color = 'var(--success-color)';
+
+          setTimeout(() => {
+              element.textContent = originalText;
+              element.style.color = '';
+          }, 2000);
+      }).catch(err => {
+          console.error('Failed to copy:', err);
+      });
+  }
+
+  // Get cached data or fetch new
+  function getCachedData(key) {
+      const cached = apiCache.get(key);
+      if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+          console.log('Using cached data for:', key);
+          return cached.data;
+      }
+      return null;
+  }
+
+  // Set cache data
+  function setCacheData(key, data) {
+      apiCache.set(key, {
+          data: data,
+          timestamp: Date.now()
+      });
   }
 
   // Detect browser information
@@ -122,24 +222,91 @@
   // Populate user info in the UI
   function populateUserInfo(data) {
       // Update UI with user's IP info
-      document.getElementById('userIp').textContent = data.ip;
+      const ipElement = document.getElementById('userIp');
+      ipElement.textContent = data.ip;
+      ipElement.style.cursor = 'pointer';
+      ipElement.title = 'Click to copy IP address';
+      ipElement.onclick = () => copyToClipboard(data.ip, 'userIp');
 
-      // Network Information
-      document.getElementById('userIpType').textContent = data.version ? `${data.version}` : 'N/A';
+      // Determine IP version and classification
+      const ipVersion = getIPVersion(data.ip);
+      const privateRange = isPrivateIP(data.ip);
+      const isDatacenter = data.asn ? isDatacenterIP(data.asn) : false;
+
+      // Network Information with enhanced classification
+      let ipTypeText = ipVersion;
+      if (privateRange) {
+          ipTypeText += ` (${privateRange.name})`;
+      } else if (isDatacenter) {
+          ipTypeText += ' (Datacenter/Hosting)';
+      } else if (data.connection_type) {
+          ipTypeText += ` (${data.connection_type})`;
+      }
+
+      document.getElementById('userIpType').textContent = ipTypeText;
       document.getElementById('userISP').textContent = data.org || 'N/A';
       document.getElementById('userASN').textContent = data.asn || 'N/A';
       document.getElementById('userNetwork').textContent = data.network || 'N/A';
+
+      // Connection and privacy status
+      let connectionType = 'Unknown';
+      if (isDatacenter) {
+          connectionType = 'Datacenter/Hosting';
+      } else if (data.connection_type) {
+          connectionType = data.connection_type;
+      } else if (privateRange) {
+          connectionType = 'Private Network';
+      }
+      document.getElementById('userConnectionType').textContent = connectionType;
+
+      // Privacy status indicators
+      let privacyStatus = 'Standard';
+      const privacyIndicators = [];
+      if (privateRange) {
+          privacyIndicators.push('Private IP');
+      }
+      if (data.is_proxy || data.proxy) {
+          privacyIndicators.push('Proxy Detected');
+      }
+      if (data.is_hosting || isDatacenter) {
+          privacyIndicators.push('Hosting/VPN Likely');
+      }
+      if (data.is_tor) {
+          privacyIndicators.push('Tor Exit Node');
+      }
+
+      if (privacyIndicators.length > 0) {
+          privacyStatus = privacyIndicators.join(', ');
+      }
+      document.getElementById('userPrivacy').textContent = privacyStatus;
 
       // Location Details
       document.getElementById('userCity').textContent = data.city || 'N/A';
       document.getElementById('userRegion').textContent = data.region || 'N/A';
       document.getElementById('userCountry').textContent = `${data.country_name || 'N/A'} ${data.country_flag || ''}`;
       document.getElementById('userPostal').textContent = data.postal || 'N/A';
-      document.getElementById('userTimezone').textContent = data.timezone || 'N/A';
+
+      // Enhanced timezone display with UTC offset
+      let timezoneText = data.timezone || 'N/A';
+      if (data.timezone && data.utc_offset) {
+          timezoneText = `${data.timezone} (UTC${data.utc_offset})`;
+      }
+      document.getElementById('userTimezone').textContent = timezoneText;
+
       document.getElementById('userCurrency').textContent = data.currency ? `${data.currency} (${data.currency_name || ''})` : 'N/A';
-      document.getElementById('userCoords').textContent = (data.latitude && data.longitude)
-          ? `${data.latitude.toFixed(4)}, ${data.longitude.toFixed(4)}`
-          : 'N/A';
+
+      // Make coordinates clickable to copy
+      const coordsElement = document.getElementById('userCoords');
+      if (data.latitude && data.longitude) {
+          const coordsText = `${data.latitude.toFixed(4)}, ${data.longitude.toFixed(4)}`;
+          coordsElement.textContent = coordsText;
+          coordsElement.style.cursor = 'pointer';
+          coordsElement.title = 'Click to copy coordinates';
+          coordsElement.onclick = () => copyToClipboard(coordsText, 'userCoords');
+      } else {
+          coordsElement.textContent = 'N/A';
+      }
+
       document.getElementById('userCallingCode').textContent = data.country_calling_code || 'N/A';
 
       // Device & Browser Information
@@ -168,22 +335,69 @@
   // Fetch user's IP information on load
   async function getUserIP() {
       try {
-          // Try primary API
-          let response = await fetch('https://ipapi.co/json/');
+          // Check cache first
+          const cached = getCachedData('userIP');
+          if (cached) {
+              populateUserInfo(cached);
+              return;
+          }
 
-          // Check if we got rate limited
-          if (response.status === 429) {
-              console.warn('Rate limited on ipapi.co, trying fallback...');
-              // Fallback to ip-api.com
-              response = await
-  fetch('http://ip-api.com/json/?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query');
+          // Try primary API with retry logic
+          let response;
+          let data;
+          let attempts = 0;
+          const maxAttempts = 2;
+
+          while (attempts < maxAttempts) {
+              try {
+                  response = await fetch('https://ipapi.co/json/', {
+                      signal: AbortSignal.timeout(10000) // 10 second timeout
+                  });
+
+                  // Check if we got rate limited
+                  if (response.status === 429) {
+                      console.warn('Rate limited on ipapi.co, trying fallback...');
+                      break;
+                  }
+
+                  if (!response.ok) {
+                      throw new Error(`HTTP error! status: ${response.status}`);
+                  }
+
+                  data = await response.json();
+
+                  if (data.error) {
+                      throw new Error(data.reason || 'Failed to fetch IP data');
+                  }
+
+                  // Success - cache and populate
+                  setCacheData('userIP', data);
+                  populateUserInfo(data);
+                  return;
+              } catch (err) {
+                  attempts++;
+                  if (attempts >= maxAttempts) {
+                      console.warn('Primary API failed, trying fallback...', err);
+                      break;
+                  }
+                  // Wait before retry
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+              }
+          }
+
+          // Fallback to ip-api.com (HTTPS version)
+          try {
+              response = await fetch('https://ipapi.co/json/?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query,proxy,hosting', {
+                  signal: AbortSignal.timeout(10000)
+              });
+
               const fallbackData = await response.json();
 
               if (fallbackData.status === 'success') {
                   // Map fallback API response to our format
-                  const data = {
+                  data = {
                       ip: fallbackData.query,
-                      version: 'IPv4',
+                      version: getIPVersion(fallbackData.query),
                       city: fallbackData.city,
                       region: fallbackData.regionName,
                       country_name: fallbackData.country,
@@ -194,23 +408,26 @@
                       timezone: fallbackData.timezone,
                       org: fallbackData.isp,
                       asn: fallbackData.as,
-                      network: 'N/A'
+                      network: 'N/A',
+                      is_proxy: fallbackData.proxy,
+                      is_hosting: fallbackData.hosting
                   };
+
+                  setCacheData('userIP', data);
                   populateUserInfo(data);
                   return;
               }
+          } catch (fallbackError) {
+              console.error('Fallback API also failed:', fallbackError);
           }
 
-          const data = await response.json();
+          throw new Error('All API attempts failed');
 
-          if (data.error) {
-              throw new Error(data.reason || 'Failed to fetch IP data');
-          }
-
-          populateUserInfo(data);
       } catch (error) {
           console.error('Error fetching user IP:', error);
-          document.getElementById('userIp').textContent = 'Error loading IP';
+          const ipDisplay = document.getElementById('userIp');
+          ipDisplay.textContent = 'Error loading IP data';
+          ipDisplay.style.color = 'var(--error-color)';
 
           // Still show device/browser info even if IP fetch fails
           const systemInfo = getSystemInfo();
@@ -230,50 +447,132 @@
 
   // Trace a specific IP address
   async function traceIP(ip) {
-      // Validate IP format
-      const ipPattern = /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/;
-      if (!ipPattern.test(ip)) {
-          showError('Please enter a valid IP address (e.g., 8.8.8.8)');
+      // Validate IP format (IPv4 or IPv6)
+      if (!isValidIPv4(ip) && !isValidIPv6(ip)) {
+          showError('Please enter a valid IPv4 (e.g., 8.8.8.8) or IPv6 address');
           return;
       }
 
-      // Validate IP octets
-      const octets = ip.split('.');
-      if (octets.some(octet => parseInt(octet) > 255)) {
-          showError('Invalid IP address. Each octet must be between 0 and 255.');
+      // Check if it's a private/reserved IP
+      const privateRange = isPrivateIP(ip);
+      if (privateRange) {
+          showError(`Cannot trace ${privateRange.name} address. This IP is not publicly routable.`);
           return;
       }
 
       hideError();
       hideTraceResult();
 
-      try {
-          const response = await fetch(`https://ipapi.co/${ip}/json/`);
-          const data = await response.json();
+      // Show loading state
+      const traceBtn = document.getElementById('traceBtn');
+      const originalText = traceBtn.textContent;
+      traceBtn.textContent = 'Tracing...';
+      traceBtn.disabled = true;
 
-          if (data.error) {
-              throw new Error(data.reason || 'Failed to fetch IP data');
+      try {
+          // Check cache first
+          const cacheKey = `trace_${ip}`;
+          const cached = getCachedData(cacheKey);
+
+          let data;
+          if (cached) {
+              data = cached;
+          } else {
+              // Try primary API with timeout
+              let response = await fetch(`https://ipapi.co/${ip}/json/`, {
+                  signal: AbortSignal.timeout(10000)
+              });
+
+              // Handle rate limiting with fallback
+              if (response.status === 429) {
+                  console.warn('Rate limited, trying fallback API...');
+                  response = await fetch(`https://ipapi.co/${ip}/json/?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,as,query,proxy,hosting`, {
+                      signal: AbortSignal.timeout(10000)
+                  });
+              }
+
+              if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+              }
+
+              data = await response.json();
+
+              if (data.error) {
+                  throw new Error(data.reason || 'Failed to fetch IP data');
+              }
+
+              // Cache the result
+              setCacheData(cacheKey, data);
           }
 
+          // Analyze IP characteristics
+          const ipVersion = getIPVersion(ip);
+          const isDatacenter = data.asn ? isDatacenterIP(data.asn) : false;
+
           // Update UI with traced IP info
-          document.getElementById('tracedIp').textContent = data.ip;
+          const tracedIpElement = document.getElementById('tracedIp');
+          tracedIpElement.textContent = data.ip;
+          tracedIpElement.style.cursor = 'pointer';
+          tracedIpElement.title = 'Click to copy IP address';
+          tracedIpElement.onclick = () => copyToClipboard(data.ip, 'tracedIp');
+
           document.getElementById('traceCity').textContent = data.city || 'N/A';
           document.getElementById('traceRegion').textContent = data.region || 'N/A';
-          document.getElementById('traceCountry').textContent = `${data.country_name || 'N/A'} (${data.country_code || '-'})`;
-          document.getElementById('traceISP').textContent = data.org || 'N/A';
-          document.getElementById('traceLat').textContent = data.latitude || 'N/A';
-          document.getElementById('traceLon').textContent = data.longitude || 'N/A';
+          document.getElementById('traceCountry').textContent = `${data.country_name || 'N/A'} ${data.country_flag || ''} (${data.country_code || '-'})`;
+
+          let ispText = data.org || 'N/A';
+          if (isDatacenter) {
+              ispText += ' (Datacenter/Hosting)';
+          }
+          if (data.is_proxy) {
+              ispText += ' (Proxy Detected)';
+          }
+          document.getElementById('traceISP').textContent = ispText;
+
+          const latElement = document.getElementById('traceLat');
+          const lonElement = document.getElementById('traceLon');
+          latElement.textContent = data.latitude ? data.latitude.toFixed(6) : 'N/A';
+          lonElement.textContent = data.longitude ? data.longitude.toFixed(6) : 'N/A';
+
+          // Add click to copy for coordinates
+          if (data.latitude && data.longitude) {
+              const coords = `${data.latitude.toFixed(6)}, ${data.longitude.toFixed(6)}`;
+              latElement.style.cursor = 'pointer';
+              lonElement.style.cursor = 'pointer';
+              latElement.title = 'Click to copy coordinates';
+              lonElement.title = 'Click to copy coordinates';
+              latElement.onclick = () => copyToClipboard(coords, 'traceLat');
+              lonElement.onclick = () => copyToClipboard(coords, 'traceLon');
+          }
+
+          // Show additional info if available
+          if (document.getElementById('traceASN')) {
+              document.getElementById('traceASN').textContent = data.asn || 'N/A';
+          }
+          if (document.getElementById('traceTimezone')) {
+              document.getElementById('traceTimezone').textContent = data.timezone || 'N/A';
+          }
+          if (document.getElementById('traceIPType')) {
+              let typeText = ipVersion;
+              if (isDatacenter) typeText += ' (Datacenter)';
+              else if (data.connection_type) typeText += ` (${data.connection_type})`;
+              document.getElementById('traceIPType').textContent = typeText;
+          }
 
           // Show result
           showTraceResult();
 
           // Update map with traced location
           if (data.latitude && data.longitude) {
-              addMarker(data.latitude, data.longitude, `${data.city}, ${data.country_name}`);
+              addMarker(data.latitude, data.longitude, `${data.city || 'Unknown'}, ${data.country_name || 'Unknown'}`);
           }
       } catch (error) {
           console.error('Error tracing IP:', error);
-          showError(`Error: ${error.message}`);
+          showError(`Error: ${error.message || 'Failed to trace IP address'}`);
+      } finally {
+          // Restore button state
+          traceBtn.textContent = originalText;
+          traceBtn.disabled = false;
       }
   }
 

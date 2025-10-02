@@ -102,11 +102,14 @@
                   <section class="card ip-info-section">
                       <h2>Your IP Address</h2>
                       <div class="ip-display" id="userIp">Loading...</div>
+                      <div class="info-disclaimer">
+                          <small><strong>Accuracy Note:</strong> Geolocation data is approximate (typically accurate to city-level). If you're using a VPN, proxy, or mobile network, the displayed location may differ from your actual location. IP addresses from datacenters or hosting providers may indicate VPN usage.</small>
+                      </div>
 
                       <h3 class="section-title">Network Information</h3>
                       <div class="info-grid" id="userInfo">
                           <div class="info-item">
-                              <span class="info-label">IP Address:</span>
+                              <span class="info-label">IP Type:</span>
                               <span class="info-value" id="userIpType">-</span>
                           </div>
                           <div class="info-item">
@@ -120,6 +123,14 @@
                           <div class="info-item">
                               <span class="info-label">Network:</span>
                               <span class="info-value" id="userNetwork">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Connection Type:</span>
+                              <span class="info-value" id="userConnectionType">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Privacy Status:</span>
+                              <span class="info-value" id="userPrivacy">-</span>
                           </div>
                       </div>
 
@@ -204,14 +215,38 @@
                               type="text"
                               id="ipInput"
                               class="ip-input"
-                              placeholder="Enter IP address (e.g., 8.8.8.8)"
-                              pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
+                              placeholder="Enter IPv4 (8.8.8.8) or IPv6 (2001:4860:4860::8888)"
                           />
                           <button id="traceBtn" class="trace-btn">Trace IP</button>
+                      </div>
+                      <div class="info-disclaimer">
+                          <small>Note: Geolocation data is approximate (typically city-level). VPNs, proxies, and mobile networks may show different locations than actual user location.</small>
                       </div>
                       <div id="traceResult" class="trace-result hidden">
                           <h3>IP Information</h3>
                           <div class="ip-display" id="tracedIp"></div>
+
+                          <h4 class="subsection-title">Network Details</h4>
+                          <div class="info-grid">
+                              <div class="info-item">
+                                  <span class="info-label">IP Type:</span>
+                                  <span class="info-value" id="traceIPType">-</span>
+                              </div>
+                              <div class="info-item">
+                                  <span class="info-label">ISP/Organization:</span>
+                                  <span class="info-value" id="traceISP">-</span>
+                              </div>
+                              <div class="info-item">
+                                  <span class="info-label">ASN:</span>
+                                  <span class="info-value" id="traceASN">-</span>
+                              </div>
+                              <div class="info-item">
+                                  <span class="info-label">Timezone:</span>
+                                  <span class="info-value" id="traceTimezone">-</span>
+                              </div>
+                          </div>
+
+                          <h4 class="subsection-title">Geographic Location</h4>
                           <div class="info-grid">
                               <div class="info-item">
                                   <span class="info-label">City:</span>
@@ -224,10 +259,6 @@
                               <div class="info-item">
                                   <span class="info-label">Country:</span>
                                   <span class="info-value" id="traceCountry">-</span>
-                              </div>
-                              <div class="info-item">
-                                  <span class="info-label">ISP:</span>
-                                  <span class="info-value" id="traceISP">-</span>
                               </div>
                               <div class="info-item">
                                   <span class="info-label">Latitude:</span>
