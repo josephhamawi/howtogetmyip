@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Finder & Tracer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Ad Banner 1 - Top -->
+        <div class="ad-banner ad-top">
+            <p>Advertisement Space 728x90</p>
+        </div>
+
+        <header class="header">
+            <h1 class="title">IP Finder & Tracer</h1>
+            <p class="subtitle">Discover and trace IP addresses with geolocation</p>
+        </header>
+
+        <div class="content-wrapper">
+            <!-- Left Ad Banner -->
+            <div class="ad-banner ad-side ad-left">
+                <p>Ad 160x600</p>
+            </div>
+
+            <main class="main-content">
+                <!-- Your IP Section -->
+                <section class="card ip-info-section">
+                    <h2>Your IP Address</h2>
+                    <div class="ip-display" id="userIp">Loading...</div>
+                    <div class="info-grid" id="userInfo">
+                        <div class="info-item">
+                            <span class="info-label">City:</span>
+                            <span class="info-value" id="userCity">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Region:</span>
+                            <span class="info-value" id="userRegion">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Country:</span>
+                            <span class="info-value" id="userCountry">-</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">ISP:</span>
+                            <span class="info-value" id="userISP">-</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- IP Tracer Section -->
+                <section class="card tracer-section">
+                    <h2>Trace IP Address</h2>
+                    <div class="input-group">
+                        <input
+                            type="text"
+                            id="ipInput"
+                            class="ip-input"
+                            placeholder="Enter IP address (e.g., 8.8.8.8)"
+                            pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
+                        />
+                        <button id="traceBtn" class="trace-btn">Trace IP</button>
+                    </div>
+                    <div id="traceResult" class="trace-result hidden">
+                        <h3>IP Information</h3>
+                        <div class="ip-display" id="tracedIp"></div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">City:</span>
+                                <span class="info-value" id="traceCity">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Region:</span>
+                                <span class="info-value" id="traceRegion">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Country:</span>
+                                <span class="info-value" id="traceCountry">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">ISP:</span>
+                                <span class="info-value" id="traceISP">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Latitude:</span>
+                                <span class="info-value" id="traceLat">-</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Longitude:</span>
+                                <span class="info-value" id="traceLon">-</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="errorMessage" class="error-message hidden"></div>
+                </section>
+
+                <!-- Map Section -->
+                <section class="card map-section">
+                    <h2>Location Map</h2>
+                    <div id="map" class="map-container"></div>
+                </section>
+            </main>
+
+            <!-- Right Ad Banner -->
+            <div class="ad-banner ad-side ad-right">
+                <p>Ad 160x600</p>
+            </div>
+        </div>
+
+        <!-- Ad Banner 2 - Bottom -->
+        <div class="ad-banner ad-bottom">
+            <p>Advertisement Space 728x90</p>
+        </div>
+
+        <footer class="footer">
+            <p>&copy; 2025 IP Finder & Tracer. No data is stored or saved.</p>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
