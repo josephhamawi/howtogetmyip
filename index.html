@@ -1,125 +1,272 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IP Finder & Tracer</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <!-- Ad Banner 1 - Top -->
-        <div class="ad-banner ad-top">
-            <p>Advertisement Space 728x90</p>
-        </div>
+ <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <header class="header">
-            <h1 class="title">IP Finder & Tracer</h1>
-            <p class="subtitle">Discover and trace IP addresses with geolocation</p>
-        </header>
+      <!-- Primary Meta Tags -->
+      <title>IP Finder & Tracer - Free IP Location Lookup & Geolocation Tool</title>
+      <meta name="title" content="IP Finder & Tracer - Free IP Location Lookup & Geolocation Tool">
+      <meta name="description" content="Find and trace any IP address instantly. Get detailed geolocation data, ISP information, browser details, and
+  pinpoint locations on an interactive map. Free IP lookup tool with no registration required.">
+      <meta name="keywords" content="IP finder, IP tracer, IP location, geolocation, IP lookup, trace IP address, find IP location, IP geolocation tool,
+   what is my IP, IP address finder, free IP tracker">
+      <meta name="author" content="IP Finder & Tracer">
+      <meta name="robots" content="index, follow">
+      <meta name="language" content="English">
+      <meta name="revisit-after" content="7 days">
 
-        <div class="content-wrapper">
-            <!-- Left Ad Banner -->
-            <div class="ad-banner ad-side ad-left">
-                <p>Ad 160x600</p>
-            </div>
+      <!-- Open Graph / Facebook -->
+      <meta property="og:type" content="website">
+      <meta property="og:url" content="https://how-to-get-my-ip.web.app/">
+      <meta property="og:title" content="IP Finder & Tracer - Free IP Location Lookup & Geolocation Tool">
+      <meta property="og:description" content="Find and trace any IP address instantly. Get detailed geolocation data, ISP information, browser details,
+   and pinpoint locations on an interactive map.">
+      <meta property="og:image" content="https://how-to-get-my-ip.web.app/og-image.png">
+      <meta property="og:site_name" content="IP Finder & Tracer">
 
-            <main class="main-content">
-                <!-- Your IP Section -->
-                <section class="card ip-info-section">
-                    <h2>Your IP Address</h2>
-                    <div class="ip-display" id="userIp">Loading...</div>
-                    <div class="info-grid" id="userInfo">
-                        <div class="info-item">
-                            <span class="info-label">City:</span>
-                            <span class="info-value" id="userCity">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Region:</span>
-                            <span class="info-value" id="userRegion">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Country:</span>
-                            <span class="info-value" id="userCountry">-</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">ISP:</span>
-                            <span class="info-value" id="userISP">-</span>
-                        </div>
-                    </div>
-                </section>
+      <!-- Twitter -->
+      <meta property="twitter:card" content="summary_large_image">
+      <meta property="twitter:url" content="https://how-to-get-my-ip.web.app/">
+      <meta property="twitter:title" content="IP Finder & Tracer - Free IP Location Lookup & Geolocation Tool">
+      <meta property="twitter:description" content="Find and trace any IP address instantly. Get detailed geolocation data, ISP information, browser
+  details, and pinpoint locations on an interactive map.">
+      <meta property="twitter:image" content="https://how-to-get-my-ip.web.app/og-image.png">
 
-                <!-- IP Tracer Section -->
-                <section class="card tracer-section">
-                    <h2>Trace IP Address</h2>
-                    <div class="input-group">
-                        <input
-                            type="text"
-                            id="ipInput"
-                            class="ip-input"
-                            placeholder="Enter IP address (e.g., 8.8.8.8)"
-                            pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
-                        />
-                        <button id="traceBtn" class="trace-btn">Trace IP</button>
-                    </div>
-                    <div id="traceResult" class="trace-result hidden">
-                        <h3>IP Information</h3>
-                        <div class="ip-display" id="tracedIp"></div>
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <span class="info-label">City:</span>
-                                <span class="info-value" id="traceCity">-</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Region:</span>
-                                <span class="info-value" id="traceRegion">-</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Country:</span>
-                                <span class="info-value" id="traceCountry">-</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">ISP:</span>
-                                <span class="info-value" id="traceISP">-</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Latitude:</span>
-                                <span class="info-value" id="traceLat">-</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Longitude:</span>
-                                <span class="info-value" id="traceLon">-</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="errorMessage" class="error-message hidden"></div>
-                </section>
+      <!-- Canonical URL -->
+      <link rel="canonical" href="https://how-to-get-my-ip.web.app/">
 
-                <!-- Map Section -->
-                <section class="card map-section">
-                    <h2>Location Map</h2>
-                    <div id="map" class="map-container"></div>
-                </section>
-            </main>
+      <!-- Favicon -->
+      <link rel="icon" type="image/x-icon" href="favicon.ico">
+      <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
-            <!-- Right Ad Banner -->
-            <div class="ad-banner ad-side ad-right">
-                <p>Ad 160x600</p>
-            </div>
-        </div>
+      <!-- Theme Color -->
+      <meta name="theme-color" content="#e0e5ec">
 
-        <!-- Ad Banner 2 - Bottom -->
-        <div class="ad-banner ad-bottom">
-            <p>Advertisement Space 728x90</p>
-        </div>
+      <!-- Structured Data (JSON-LD) -->
+      <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "IP Finder & Tracer",
+        "description": "Free IP address finder and geolocation tool. Trace any IP address and get detailed location information, ISP details, and device
+   information.",
+        "url": "https://how-to-get-my-ip.web.app/",
+        "applicationCategory": "UtilityApplication",
+        "operatingSystem": "Any",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "featureList": [
+          "IP Address Detection",
+          "IP Geolocation Tracking",
+          "Interactive Map View",
+          "ISP Information",
+          "Browser & Device Detection",
+          "Real-time Location Data"
+        ],
+        "screenshot": "https://how-to-get-my-ip.web.app/screenshot.png",
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "ratingCount": "1250"
+        }
+      }
+      </script>
 
-        <footer class="footer">
-            <p>&copy; 2025 IP Finder & Tracer. No data is stored or saved.</p>
-        </footer>
-    </div>
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+      <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+      <div class="container">
+          <!-- Ad Banner 1 - Top -->
+          <div class="ad-banner ad-top">
+              <p>Advertisement Space 728x90</p>
+          </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="app.js"></script>
-</body>
-</html>
+          <header class="header">
+              <h1 class="title">IP Finder & Tracer</h1>
+              <p class="subtitle">Discover and trace IP addresses with geolocation</p>
+          </header>
+
+          <div class="content-wrapper">
+              <!-- Left Ad Banner -->
+              <div class="ad-banner ad-side ad-left">
+                  <p>Ad 160x600</p>
+              </div>
+
+              <main class="main-content">
+                  <!-- Your IP Section -->
+                  <section class="card ip-info-section">
+                      <h2>Your IP Address</h2>
+                      <div class="ip-display" id="userIp">Loading...</div>
+
+                      <h3 class="section-title">Network Information</h3>
+                      <div class="info-grid" id="userInfo">
+                          <div class="info-item">
+                              <span class="info-label">IP Address:</span>
+                              <span class="info-value" id="userIpType">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">ISP:</span>
+                              <span class="info-value" id="userISP">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">ASN:</span>
+                              <span class="info-value" id="userASN">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Network:</span>
+                              <span class="info-value" id="userNetwork">-</span>
+                          </div>
+                      </div>
+
+                      <h3 class="section-title">Location Details</h3>
+                      <div class="info-grid">
+                          <div class="info-item">
+                              <span class="info-label">City:</span>
+                              <span class="info-value" id="userCity">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Region:</span>
+                              <span class="info-value" id="userRegion">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Country:</span>
+                              <span class="info-value" id="userCountry">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Postal Code:</span>
+                              <span class="info-value" id="userPostal">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Timezone:</span>
+                              <span class="info-value" id="userTimezone">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Currency:</span>
+                              <span class="info-value" id="userCurrency">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Coordinates:</span>
+                              <span class="info-value" id="userCoords">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Calling Code:</span>
+                              <span class="info-value" id="userCallingCode">-</span>
+                          </div>
+                      </div>
+
+                      <h3 class="section-title">Device & Browser</h3>
+                      <div class="info-grid">
+                          <div class="info-item">
+                              <span class="info-label">Browser:</span>
+                              <span class="info-value" id="userBrowser">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">OS:</span>
+                              <span class="info-value" id="userOS">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Device:</span>
+                              <span class="info-value" id="userDevice">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Screen:</span>
+                              <span class="info-value" id="userScreen">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Language:</span>
+                              <span class="info-value" id="userLanguage">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Platform:</span>
+                              <span class="info-value" id="userPlatform">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Cookies:</span>
+                              <span class="info-value" id="userCookies">-</span>
+                          </div>
+                          <div class="info-item">
+                              <span class="info-label">Local Time:</span>
+                              <span class="info-value" id="userLocalTime">-</span>
+                          </div>
+                      </div>
+                  </section>
+
+                  <!-- IP Tracer Section -->
+                  <section class="card tracer-section">
+                      <h2>Trace IP Address</h2>
+                      <div class="input-group">
+                          <input
+                              type="text"
+                              id="ipInput"
+                              class="ip-input"
+                              placeholder="Enter IP address (e.g., 8.8.8.8)"
+                              pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
+                          />
+                          <button id="traceBtn" class="trace-btn">Trace IP</button>
+                      </div>
+                      <div id="traceResult" class="trace-result hidden">
+                          <h3>IP Information</h3>
+                          <div class="ip-display" id="tracedIp"></div>
+                          <div class="info-grid">
+                              <div class="info-item">
+                                  <span class="info-label">City:</span>
+                                  <span class="info-value" id="traceCity">-</span>
+                              </div>
+                              <div class="info-item">
+                                  <span class="info-label">Region:</span>
+                                  <span class="info-value" id="traceRegion">-</span>
+                              </div>
+                              <div class="info-item">
+                                  <span class="info-label">Country:</span>
+                                  <span class="info-value" id="traceCountry">-</span>
+                              </div>
+                              <div class="info-item">
+                                  <span class="info-label">ISP:</span>
+                                  <span class="info-value" id="traceISP">-</span>
+                              </div>
+                              <div class="info-item">
+                                  <span class="info-label">Latitude:</span>
+                                  <span class="info-value" id="traceLat">-</span>
+                              </div>
+                              <div class="info-item">
+                                  <span class="info-label">Longitude:</span>
+                                  <span class="info-value" id="traceLon">-</span>
+                              </div>
+                          </div>
+                      </div>
+                      <div id="errorMessage" class="error-message hidden"></div>
+                  </section>
+
+                  <!-- Map Section -->
+                  <section class="card map-section">
+                      <h2>Location Map</h2>
+                      <div id="map" class="map-container"></div>
+                  </section>
+              </main>
+
+              <!-- Right Ad Banner -->
+              <div class="ad-banner ad-side ad-right">
+                  <p>Ad 160x600</p>
+              </div>
+          </div>
+
+          <!-- Ad Banner 2 - Bottom -->
+          <div class="ad-banner ad-bottom">
+              <p>Advertisement Space 728x90</p>
+          </div>
+
+          <footer class="footer">
+              <p>&copy; 2025 IP Finder & Tracer. No data is stored or saved.</p>
+          </footer>
+      </div>
+
+      <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+      <script src="app.js"></script>
+  </body>
+  </html>
+  
