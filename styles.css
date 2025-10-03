@@ -41,24 +41,10 @@ body {
         -9px -9px 16px var(--shadow-light);
 }
 
-.header-title-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 10px;
-}
-
-.header-logo-inline {
-    width: 28px;
-    height: 28px;
-    animation: fadeIn 0.5s ease;
-}
-
 .title {
     font-size: 2.5rem;
     font-weight: 700;
-    margin: 0;
+    margin-bottom: 10px;
     background: linear-gradient(135deg, var(--accent-color), #9b59b6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
