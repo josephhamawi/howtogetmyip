@@ -3,7 +3,7 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
     <url>
-        <loc>https://your-project-id.web.app/</loc>
+        <loc>https://how-to-get-my-ip.web.app/</loc>
         <lastmod>2025-10-02</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate OG Image and Favicon</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #e0e5ec;
+        }
+        #og-preview {
+            width: 1200px;
+            height: 630px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        .og-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            width: 80%;
+        }
+        .og-title {
+            font-size: 72px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 10px rgba(0,0,0,0.3);
+        }
+        .og-subtitle {
+            font-size: 36px;
+            margin-bottom: 40px;
+            opacity: 0.95;
+        }
+        .og-features {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            font-size: 24px;
+        }
+        .feature {
+            background: rgba(255,255,255,0.2);
+            padding: 15px 30px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .logo-preview {
+            width: 200px;
+            height: 200px;
+            margin: 20px;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        #instructions {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            max-width: 1200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Generate Images for IP Finder</h1>
+
+    <h2>Logo Preview</h2>
+    <img src="logo.svg" class="logo-preview" id="logoPreview">
+    <div>
+        <button onclick="downloadLogo('png', 512)">Download Logo PNG (512x512)</button>
+        <button onclick="downloadLogo('png', 192)">Download Logo PNG (192x192)</button>
+        <button onclick="downloadLogo('ico', 32)">Download Favicon ICO (32x32)</button>
+    </div>
+
+    <h2>OG Image Preview (1200x630)</h2>
+    <div id="og-preview">
+        <div class="og-content">
+            <div class="og-title">🌍 How to get my IP</div>
+            <div class="og-subtitle">Discover Your IP Address & Location Instantly</div>
+            <div class="og-features">
+                <div class="feature">📍 Your Location</div>
+                <div class="feature">🔍 IPv4 & IPv6</div>
+                <div class="feature">🛡️ VPN Detection</div>
+                <div class="feature">🗺️ Live Map</div>
+            </div>
+        </div>
+    </div>
+    <button onclick="downloadOGImage()">Download OG Image (1200x630)</button>
+
+    <div id="instructions">
+        <h3>📝 Instructions:</h3>
+        <ol>
+            <li><strong>Download all images</strong> using the buttons above</li>
+            <li><strong>Save them</strong> to your project folder: <code>C:\Users\joseph\Development\Claude\ipfinder\</code></li>
+            <li>Rename the 32x32 ICO file to <code>favicon.ico</code></li>
+            <li>Rename the 192x192 PNG to <code>apple-touch-icon.png</code></li>
+            <li>Keep the 1200x630 as <code>og-image.png</code></li>
+            <li>I'll update your HTML to use these images</li>
+        </ol>
+        <p><strong>Alternative:</strong> Right-click on each preview and "Save Image As..." with the correct names.</p>
+    </div>
+
+    <script>
+        function downloadLogo(format, size) {
+            const img = document.getElementById('logoPreview');
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            const tempImg = new Image();
+            tempImg.onload = function() {
+                ctx.drawImage(tempImg, 0, 0, size, size);
+
+                if (format === 'ico') {
+                    // For ICO, we'll download as PNG and you can convert it
+                    canvas.toBlob(function(blob) {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `favicon-${size}.png`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    });
+                } else {
+                    canvas.toBlob(function(blob) {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `logo-${size}.${format}`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    });
+                }
+            };
+            tempImg.src = img.src;
+        }
+
+        function downloadOGImage() {
+            const element = document.getElementById('og-preview');
+
+            // Use html2canvas if available, otherwise provide manual instructions
+            if (typeof html2canvas !== 'undefined') {
+                html2canvas(element, {
+                    width: 1200,
+                    height: 630,
+                    scale: 1
+                }).then(canvas => {
+                    canvas.toBlob(function(blob) {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'og-image.png';
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    });
+                });
+            } else {
+                alert('Please right-click on the OG Image preview and select "Save image as..." and save it as og-image.png');
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</body>
+</html>

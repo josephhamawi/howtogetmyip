@@ -1,0 +1,63 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle with Neomorphic Effect -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e0e5ec;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c8d0e0;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="10" dy="10" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Main Background -->
+  <rect width="512" height="512" fill="url(#bgGradient)" rx="120"/>
+
+  <!-- Globe/Network Icon -->
+  <g transform="translate(256, 256)">
+    <!-- Globe Circle -->
+    <circle cx="0" cy="0" r="140" fill="none" stroke="#3498db" stroke-width="8" opacity="0.3"/>
+    <circle cx="0" cy="0" r="120" fill="none" stroke="#3498db" stroke-width="6" opacity="0.5"/>
+
+    <!-- Latitude Lines -->
+    <ellipse cx="0" cy="0" rx="120" ry="40" fill="none" stroke="#3498db" stroke-width="4" opacity="0.6"/>
+    <ellipse cx="0" cy="0" rx="120" ry="80" fill="none" stroke="#3498db" stroke-width="4" opacity="0.6"/>
+    <line x1="-120" y1="0" x2="120" y2="0" stroke="#3498db" stroke-width="4" opacity="0.6"/>
+
+    <!-- Longitude Lines -->
+    <ellipse cx="0" cy="0" rx="40" ry="120" fill="none" stroke="#3498db" stroke-width="4" opacity="0.6"/>
+    <ellipse cx="0" cy="0" rx="80" ry="120" fill="none" stroke="#3498db" stroke-width="4" opacity="0.6"/>
+    <line x1="0" y1="-120" x2="0" y2="120" stroke="#3498db" stroke-width="4" opacity="0.6"/>
+
+    <!-- Location Pin -->
+    <g transform="translate(0, -10)">
+      <path d="M0,-60 Q-20,-60 -20,-40 Q-20,-20 0,20 Q20,-20 20,-40 Q20,-60 0,-60 Z"
+            fill="#e74c3c" stroke="#c0392b" stroke-width="3"/>
+      <circle cx="0" cy="-40" r="12" fill="#ffffff"/>
+    </g>
+
+    <!-- Network Nodes -->
+    <circle cx="80" cy="-60" r="8" fill="#9b59b6"/>
+    <circle cx="-70" cy="70" r="8" fill="#9b59b6"/>
+    <circle cx="90" cy="50" r="8" fill="#9b59b6"/>
+    <circle cx="-85" cy="-45" r="8" fill="#9b59b6"/>
+
+    <!-- Connection Lines -->
+    <line x1="0" y1="0" x2="80" y2="-60" stroke="#9b59b6" stroke-width="2" opacity="0.5" stroke-dasharray="5,5"/>
+    <line x1="0" y1="0" x2="-70" y2="70" stroke="#9b59b6" stroke-width="2" opacity="0.5" stroke-dasharray="5,5"/>
+    <line x1="0" y1="0" x2="90" y2="50" stroke="#9b59b6" stroke-width="2" opacity="0.5" stroke-dasharray="5,5"/>
+  </g>
+
+  <!-- IP Text Badge at Bottom -->
+  <rect x="156" y="420" width="200" height="60" rx="30" fill="#3498db" opacity="0.9"/>
+  <text x="256" y="458" font-family="Arial, sans-serif" font-size="36" font-weight="bold"
+        fill="#ffffff" text-anchor="middle">IP</text>
+</svg>

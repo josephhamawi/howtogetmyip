@@ -5,7 +5,7 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://your-project-id.web.app/sitemap.xml
+Sitemap: https://how-to-get-my-ip.web.app/sitemap.xml
 
 # Crawl-delay (optional - helps manage server load)
 Crawl-delay: 1

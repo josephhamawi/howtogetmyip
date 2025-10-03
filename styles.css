@@ -41,6 +41,13 @@ body {
         -9px -9px 16px var(--shadow-light);
 }
 
+.header-logo {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 15px;
+    animation: fadeIn 0.5s ease;
+}
+
 .title {
     font-size: 2.5rem;
     font-weight: 700;
