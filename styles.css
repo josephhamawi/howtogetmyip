@@ -337,6 +337,61 @@ body {
     font-size: 0.9rem;
 }
 
+.social-links {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow:
+        6px 6px 12px var(--shadow-dark),
+        -6px -6px 12px var(--shadow-light);
+}
+
+.social-btn:hover {
+    box-shadow:
+        4px 4px 8px var(--shadow-dark),
+        -4px -4px 8px var(--shadow-light);
+    transform: translateY(-2px);
+}
+
+.social-btn:active {
+    box-shadow:
+        inset 4px 4px 8px var(--shadow-dark),
+        inset -4px -4px 8px var(--shadow-light);
+    transform: translateY(0);
+}
+
+.instagram-btn {
+    background: linear-gradient(135deg, #f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%);
+    color: white;
+}
+
+.instagram-btn:hover {
+    background: linear-gradient(135deg, #e08323 0%,#d6582c 25%,#cc1733 50%,#bc1356 75%,#ac0878 100%);
+    box-shadow:
+        8px 8px 16px rgba(188, 24, 136, 0.3),
+        -4px -4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.instagram-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
 /* Animations */
 @keyframes fadeIn {
     from {

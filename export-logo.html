@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Export High-Res Logo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #f5f5f5;
+            text-align: center;
+        }
+        .preview {
+            margin: 30px 0;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        .logo-display {
+            width: 300px;
+            height: 300px;
+        }
+        button {
+            padding: 15px 40px;
+            margin: 10px;
+            font-size: 18px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .transparent {
+            background:
+                repeating-linear-gradient(45deg, #ddd, #ddd 10px, #fff 10px, #fff 20px);
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        .info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: left;
+        }
+        .size-btn {
+            background: #9b59b6;
+        }
+        .size-btn:hover {
+            background: #8e44ad;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 Export Logo - High Resolution with Transparency</h1>
+
+    <div class="preview transparent">
+        <img src="logo.svg" class="logo-display" id="logoPreview">
+    </div>
+
+    <div>
+        <h2>Download PNG (Transparent Background)</h2>
+        <button class="size-btn" onclick="downloadPNG(512)">512x512 (Website)</button>
+        <button class="size-btn" onclick="downloadPNG(1024)">1024x1024 (HD)</button>
+        <button class="size-btn" onclick="downloadPNG(2048)">2048x2048 (High-Res)</button>
+        <button class="size-btn" onclick="downloadPNG(4096)">4096x4096 (Ultra HD)</button>
+    </div>
+
+    <div style="margin-top: 30px;">
+        <h2>Download for Social Media</h2>
+        <button onclick="downloadPNG(180)">180x180 (Instagram Profile)</button>
+        <button onclick="downloadPNG(400)">400x400 (Facebook Profile)</button>
+        <button onclick="downloadPNG(500)">500x500 (LinkedIn)</button>
+        <button onclick="downloadPNG(1500)">1500x1500 (Instagram Post)</button>
+    </div>
+
+    <div style="margin-top: 30px;">
+        <h2>Download Favicon</h2>
+        <button onclick="downloadPNG(32)">32x32 (Favicon)</button>
+        <button onclick="downloadPNG(192)">192x192 (Apple Touch Icon)</button>
+    </div>
+
+    <div class="info">
+        <h3>✅ Features:</h3>
+        <ul>
+            <li>✨ <strong>Transparent background</strong> - perfect for any surface</li>
+            <li>🎨 <strong>Gradient colors</strong> - blue globe, purple nodes, red pin</li>
+            <li>💫 <strong>Animated pulse effect</strong> (in SVG format)</li>
+            <li>🌐 <strong>Network nodes</strong> with connection lines</li>
+            <li>📍 <strong>Location pin</strong> centered on globe</li>
+        </ul>
+
+        <h3>📱 Social Media Recommendations:</h3>
+        <ul>
+            <li><strong>Instagram Profile:</strong> 180x180 (minimum) or 1500x1500 for posts</li>
+            <li><strong>Facebook:</strong> 400x400</li>
+            <li><strong>Twitter:</strong> 400x400</li>
+            <li><strong>LinkedIn:</strong> 500x500</li>
+        </ul>
+
+        <h3>💡 Usage Tips:</h3>
+        <p><strong>For website:</strong> Use 512x512 PNG or keep the SVG (scalable!)</p>
+        <p><strong>For printing:</strong> Use 2048x2048 or 4096x4096</p>
+        <p><strong>For social media:</strong> Choose the recommended size for each platform</p>
+    </div>
+
+    <script>
+        function downloadPNG(size) {
+            const img = document.getElementById('logoPreview');
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Ensure transparency
+            ctx.clearRect(0, 0, size, size);
+
+            const tempImg = new Image();
+            tempImg.onload = function() {
+                ctx.drawImage(tempImg, 0, 0, size, size);
+
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `how-to-get-my-ip-logo-${size}x${size}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    // Show success message
+                    const btn = event.target;
+                    const originalText = btn.textContent;
+                    btn.textContent = '✅ Downloaded!';
+                    btn.style.background = '#2ecc71';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.style.background = '';
+                    }, 2000);
+                }, 'image/png');
+            };
+            tempImg.src = img.src;
+        }
+
+        // Auto-download the most common sizes on page load
+        console.log('✅ Logo export tool loaded');
+        console.log('💡 Tip: Right-click on the logo and "Save image as..." for the SVG format');
+    </script>
+</body>
+</html>
